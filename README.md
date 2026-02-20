@@ -1,9 +1,10 @@
 # Experimentação de Softwares
 
-## Repositorio destinado a disciplina de Laboratório de Experimentações de Software.
 Autores: 
  - André Cota
  - Jhonatan Gutemberg
+
+## Repositorio destinado a disciplina de Laboratório de Experimentações de Software.
 
 Será dividido em 5 trabalhos (enunciados) durante o semestre:
  1. _Características de repositórios populares_
