@@ -43,7 +43,7 @@ class RepoSearchService:
         all_repos = []
         total_collected = 0
         cursor = None
-        batch_size = 8
+        batch_size = 15
 
         while total_collected < target_count:
             query = """

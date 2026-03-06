@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from client.github_client import GitHubClient
 from services.repo_search import RepoSearchService
+from datetime import datetime
 
 
 def main():
@@ -16,6 +17,7 @@ def main():
 
     client = GitHubClient(token)
     service = RepoSearchService(client)
+    start_time = datetime.now()
     queries = [
         ("stars:>200 created:2010-01-01..2019-12-31 "
          "fork:false size:>3000"),
@@ -47,6 +49,10 @@ def main():
 
     except Exception as e:
         print(f"Erro crítico: {e}")
+
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    print(f"Tempo total de execução: {elapsed_time.total_seconds():.2f} segundos")
 
 
 if __name__ == "__main__":
