@@ -1,49 +1,49 @@
 
-ANÁLISE DE 2000 REPOSITÓRIOS POPULARES DO GITHUB
-Data da análise: 06/03/2026 20:59
+ANÁLISE DE 1000 REPOSITÓRIOS POPULARES DO GITHUB
+Data da análise: 06/03/2026 21:28
 
 RESUMO GERAL:
 -------------
 • Período analisado: 2010-01-04 a 2022-12-21
-• Total de stars: 87,197,027
-• Total de PRs aceitas: 9,931,128
-• Total de releases: 287,056
-• Total de issues: 11,319,602
+• Total de stars: 43,663,403
+• Total de PRs aceitas: 4,997,999
+• Total de releases: 143,163
+• Total de issues: 5,659,904
 • Linguagens diferentes: 49
 
 PRINCIPAIS DESCOBERTAS:
 ----------------------
 
 RQ01 - MATURIDADE:
-  → Idade média: 9.9 anos
+  → Idade média: 9.8 anos
   → Mediana: 9.9 anos
   → Conclusão: Repositórios tendem a ser maduros
 
 RQ02 - CONTRIBUIÇÕES EXTERNAS:
-  → Média de PRs: 4966
-  → Mediana de PRs: 1057
+  → Média de PRs: 4998
+  → Mediana de PRs: 1065
   → Conclusão: Alta contribuição externa
 
 RQ03 - RELEASES:
-  → Média de releases: 144
+  → Média de releases: 143
   → Mediana: 69
-  → Sem releases: 294 (14.7%)
+  → Sem releases: 147 (14.7%)
 
 RQ04 - FREQUÊNCIA DE ATUALIZAÇÃO:
-  → Média de dias desde última atualização: -0.4
-  → Mediana: 0.0
-  → Atualizados na última semana: 2000 (100.0%)
+  → Média de dias desde última atualização: -0.5
+  → Mediana: -1.0
+  → Atualizados na última semana: 1000 (100.0%)
   → Conclusão: Repositórios muito ativos
 
 RQ05 - LINGUAGENS POPULARES:
-  → Linguagem #1: TypeScript (352 repos)
-  → Linguagem #2: JavaScript (301 repos)
-  → Linguagem #3: Python (290 repos)
+  → Linguagem #1: TypeScript (177 repos)
+  → Linguagem #2: JavaScript (149 repos)
+  → Linguagem #3: Python (146 repos)
 
 RQ06 - ISSUES FECHADAS:
-  → Média de issues fechadas: 0.0%
-  → Mediana: 0.0%
-  → Com ≥80% fechadas: 0 repos
+  → Média de issues fechadas: 84.0%
+  → Mediana: 90.0%
+  → Com ≥80% fechadas: 691 repos
 
 ARQUIVOS GERADOS:
 ----------------
