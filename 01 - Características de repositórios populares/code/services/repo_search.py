@@ -22,7 +22,7 @@ class RepoSearchService:
         with open(self.filename, mode='a', newline='', encoding='utf-8') as f:
             headers = [
                 'name', 'url', 'stargazerCount', 'createdAt', 'updatedAt',
-                'primaryLanguage', 'pullRequests', 'releases', 'totalIssues'
+                'primaryLanguage', 'pullRequests', 'releases', 'totalIssues', 'closedIssues'
             ]
             writer = csv.DictWriter(
                 f, fieldnames=headers, extrasaction='ignore')
@@ -37,6 +37,7 @@ class RepoSearchService:
                 row['pullRequests'] = repo['pullRequests']['totalCount']
                 row['releases'] = repo['releases']['totalCount']
                 row['totalIssues'] = repo['totalIssues']['totalCount']
+                row['closedIssues'] = repo['closedIssues']['totalCount']
                 writer.writerow(row)
 
     def get_popular_repos(self, search_query: str, target_count: int):
@@ -58,6 +59,7 @@ class RepoSearchService:
                     pullRequests(states: MERGED) { totalCount }
                     releases { totalCount }
                     totalIssues: issues { totalCount }
+                    closedIssues: issues(states: CLOSED) { totalCount }
                   }
                 }
               }

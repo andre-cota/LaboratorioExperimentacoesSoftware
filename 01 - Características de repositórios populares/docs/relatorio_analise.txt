@@ -1,0 +1,58 @@
+
+ANÁLISE DE 2000 REPOSITÓRIOS POPULARES DO GITHUB
+Data da análise: 06/03/2026 20:59
+
+RESUMO GERAL:
+-------------
+• Período analisado: 2010-01-04 a 2022-12-21
+• Total de stars: 87,197,027
+• Total de PRs aceitas: 9,931,128
+• Total de releases: 287,056
+• Total de issues: 11,319,602
+• Linguagens diferentes: 49
+
+PRINCIPAIS DESCOBERTAS:
+----------------------
+
+RQ01 - MATURIDADE:
+  → Idade média: 9.9 anos
+  → Mediana: 9.9 anos
+  → Conclusão: Repositórios tendem a ser maduros
+
+RQ02 - CONTRIBUIÇÕES EXTERNAS:
+  → Média de PRs: 4966
+  → Mediana de PRs: 1057
+  → Conclusão: Alta contribuição externa
+
+RQ03 - RELEASES:
+  → Média de releases: 144
+  → Mediana: 69
+  → Sem releases: 294 (14.7%)
+
+RQ04 - FREQUÊNCIA DE ATUALIZAÇÃO:
+  → Média de dias desde última atualização: -0.4
+  → Mediana: 0.0
+  → Atualizados na última semana: 2000 (100.0%)
+  → Conclusão: Repositórios muito ativos
+
+RQ05 - LINGUAGENS POPULARES:
+  → Linguagem #1: TypeScript (352 repos)
+  → Linguagem #2: JavaScript (301 repos)
+  → Linguagem #3: Python (290 repos)
+
+RQ06 - ISSUES FECHADAS:
+  → Média de issues fechadas: 0.0%
+  → Mediana: 0.0%
+  → Com ≥80% fechadas: 0 repos
+
+ARQUIVOS GERADOS:
+----------------
+• RQ01_idade_repositorios.png
+• RQ02_pull_requests.png
+• RQ03_releases.png
+• RQ04_update_frequency.png
+• RQ05_languages.png
+• RQ06_closed_issues_ratio.png
+• RQ07_metrics_by_language.png
+• relatorio_analise.txt (este arquivo)
+
