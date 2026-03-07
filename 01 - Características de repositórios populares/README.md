@@ -50,7 +50,6 @@ O projeto responde às seguintes questões:
 ### RQ06: Sistemas populares possuem um alto percentual de issues fechadas?
 **Métrica:** Razão entre número de issues fechadas pelo total de issues
 - Gráficos: Distribuição e Boxplot da razão de issues fechadas
-- ⚠️ **Nota:** Requer coleta de dados com a coluna `closedIssues`
 
 ### RQ07 (BÔNUS): Métricas por linguagem
 Analisa como as métricas das RQ02, RQ03 e RQ04 se comportam por linguagem
@@ -106,7 +105,7 @@ Os resultados da análise incluem:
 
 - **7 arquivos PNG** com gráficos de alta qualidade (300 DPI)
 - **1 relatório em texto** com estatísticas resumidas
-- Análise de **2000+ repositórios** populares do GitHub
+- Análise de **1000 repositórios** populares do GitHub
 
 ### Exemplo de Descobertas
 
@@ -116,28 +115,6 @@ Os resultados da análise incluem:
 - **RQ04:** 100% dos repositórios atualizados recentemente
 - **RQ05:** TypeScript, JavaScript e Python são as linguagens mais populares
 - **RQ07:** TypeScript tem maior média de releases, C++ maior média de PRs
-
-## ⚠️ Observações Importantes
-
-### RQ06 - Issues Fechadas
-
-Para calcular corretamente a RQ06, é necessário:
-
-1. **Reexecutar a coleta de dados** com o código atualizado que inclui `closedIssues`
-2. O código de coleta (`repo_search.py`) já foi atualizado para coletar essa métrica
-3. Os dados atuais em `repositorios.csv` não possuem essa coluna
-
-Para obter dados completos da RQ06:
-```bash
-# 1. Deletar ou renomear o CSV antigo
-mv ../../repositorios.csv ../../repositorios_old.csv
-
-# 2. Executar nova coleta
-python main.py
-
-# 3. Executar análise novamente
-python analyze_repos.py
-```
 
 ## 🔧 Personalização
 
