@@ -21,7 +21,7 @@ class RepoSearchService:
 
         with open(self.filename, mode='a', newline='', encoding='utf-8') as f:
             headers = [
-                'name', 'url', 'stargazerCount', 'createdAt', 'updatedAt',
+                'name', 'url', 'stargazerCount', 'createdAt', 'pushedAt',
                 'primaryLanguage', 'pullRequests', 'releases', 'totalIssues', 'closedIssues'
             ]
             writer = csv.DictWriter(
@@ -54,7 +54,7 @@ class RepoSearchService:
                 pageInfo { hasNextPage endCursor }
                 nodes {
                   ... on Repository {
-                    name url stargazerCount createdAt updatedAt description
+                    name url stargazerCount createdAt pushedAt description
                     primaryLanguage { name }
                     pullRequests(states: MERGED) { totalCount }
                     releases { totalCount }

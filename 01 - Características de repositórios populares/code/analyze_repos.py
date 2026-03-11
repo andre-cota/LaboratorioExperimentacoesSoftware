@@ -10,7 +10,6 @@ from datetime import datetime
 import numpy as np
 from pathlib import Path
 
-# Configuração de estilo dos gráficos
 plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 plt.rcParams['figure.figsize'] = (12, 6)
@@ -20,11 +19,15 @@ plt.rcParams['font.size'] = 10
 class RepositoryAnalyzer:
     def __init__(self, csv_file=None):
         """Inicializa o analisador e carrega os dados."""
-        # Se não especificar, busca na raiz do workspace
         if csv_file is None:
-            # Caminho relativo ao script
             script_dir = Path(__file__).parent
-            csv_file = script_dir / '../../repositorios.csv'
+            candidate_paths = [
+                script_dir / '../../repositorios.csv',
+                script_dir / '../../../repositorios.csv',
+                Path.cwd() / 'repositorios.csv',
+            ]
+
+            csv_file = next((path for path in candidate_paths if path.exists()), candidate_paths[0])
         
         self.csv_file = Path(csv_file).resolve()
         self.df = None
@@ -37,17 +40,13 @@ class RepositoryAnalyzer:
         print(f"Carregando dados de {self.csv_file}...")
         self.df = pd.read_csv(self.csv_file)
         
-        # Converter datas e remover timezone para evitar problemas de comparação
         self.df['createdAt'] = pd.to_datetime(self.df['createdAt']).dt.tz_localize(None)
-        self.df['updatedAt'] = pd.to_datetime(self.df['updatedAt']).dt.tz_localize(None)
+        self.df['pushedAt'] = pd.to_datetime(self.df['pushedAt']).dt.tz_localize(None)
         
-        # Calcular métricas derivadas
         self.df['age_days'] = (self.current_date - self.df['createdAt']).dt.days
         self.df['age_years'] = self.df['age_days'] / 365.25
-        self.df['days_since_update'] = (self.current_date - self.df['updatedAt']).dt.days
+        self.df['days_since_update'] = (self.current_date - self.df['pushedAt']).dt.days
         
-        # Calcular razão de issues fechadas (RQ06)
-        # Evitar divisão por zero
         if 'closedIssues' in self.df.columns:
             self.df['closed_issues_ratio'] = self.df.apply(
                 lambda row: (row['closedIssues'] / row['totalIssues'] * 100) 
@@ -70,7 +69,6 @@ class RepositoryAnalyzer:
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Histograma da idade
         axes[0].hist(self.df['age_years'], bins=30, edgecolor='black', alpha=0.7)
         axes[0].set_xlabel('Idade (anos)')
         axes[0].set_ylabel('Número de Repositórios')
@@ -81,7 +79,6 @@ class RepositoryAnalyzer:
                         linestyle='--', label=f'Média: {self.df["age_years"].mean():.1f} anos')
         axes[0].legend()
         
-        # Boxplot da idade
         axes[1].boxplot(self.df['age_years'], vert=True)
         axes[1].set_ylabel('Idade (anos)')
         axes[1].set_title('RQ01: Boxplot da Idade dos Repositórios')
@@ -91,7 +88,6 @@ class RepositoryAnalyzer:
         plt.savefig(self.output_dir / 'RQ01_idade_repositorios.png', dpi=300, bbox_inches='tight')
         plt.close()
         
-        # Estatísticas
         print(f"Média de idade: {self.df['age_years'].mean():.2f} anos")
         print(f"Mediana de idade: {self.df['age_years'].median():.2f} anos")
         print(f"Desvio padrão: {self.df['age_years'].std():.2f} anos")
@@ -106,14 +102,12 @@ class RepositoryAnalyzer:
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Histograma (escala log devido à grande variação)
         prs = self.df['pullRequests'][self.df['pullRequests'] > 0]
         axes[0].hist(np.log10(prs + 1), bins=30, edgecolor='black', alpha=0.7)
         axes[0].set_xlabel('log10(Pull Requests + 1)')
         axes[0].set_ylabel('Número de Repositórios')
         axes[0].set_title('RQ02: Distribuição de Pull Requests Aceitas')
         
-        # Top 20 repositórios
         top_prs = self.df.nlargest(20, 'pullRequests')[['name', 'pullRequests']]
         axes[1].barh(range(len(top_prs)), top_prs['pullRequests'])
         axes[1].set_yticks(range(len(top_prs)))
@@ -138,7 +132,6 @@ class RepositoryAnalyzer:
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Histograma
         axes[0].hist(self.df['releases'], bins=50, edgecolor='black', alpha=0.7)
         axes[0].set_xlabel('Número de Releases')
         axes[0].set_ylabel('Número de Repositórios')
@@ -147,7 +140,6 @@ class RepositoryAnalyzer:
                         linestyle='--', label=f'Mediana: {self.df["releases"].median():.0f}')
         axes[0].legend()
         
-        # Top 20 repositórios
         top_releases = self.df.nlargest(20, 'releases')[['name', 'releases']]
         axes[1].barh(range(len(top_releases)), top_releases['releases'])
         axes[1].set_yticks(range(len(top_releases)))
@@ -173,7 +165,6 @@ class RepositoryAnalyzer:
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Histograma
         axes[0].hist(self.df['days_since_update'], bins=30, edgecolor='black', alpha=0.7)
         axes[0].set_xlabel('Dias desde a última atualização')
         axes[0].set_ylabel('Número de Repositórios')
@@ -182,7 +173,6 @@ class RepositoryAnalyzer:
                         linestyle='--', label=f'Mediana: {self.df["days_since_update"].median():.0f} dias')
         axes[0].legend()
         
-        # Categorias de atualização
         categories = []
         for days in self.df['days_since_update']:
             if days <= 7:
@@ -218,7 +208,6 @@ class RepositoryAnalyzer:
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Gráfico de barras
         axes[0].barh(range(len(language_counts)), language_counts.values)
         axes[0].set_yticks(range(len(language_counts)))
         axes[0].set_yticklabels(language_counts.index)
@@ -226,11 +215,9 @@ class RepositoryAnalyzer:
         axes[0].set_title('RQ05: Top 15 Linguagens mais Populares')
         axes[0].invert_yaxis()
         
-        # Adicionar valores nas barras
         for i, v in enumerate(language_counts.values):
             axes[0].text(v, i, f' {v}', va='center')
         
-        # Gráfico de pizza (top 10)
         top10_langs = language_counts.head(10)
         axes[1].pie(top10_langs.values, labels=top10_langs.index, autopct='%1.1f%%')
         axes[1].set_title('RQ05: Distribuição das Top 10 Linguagens')
@@ -250,12 +237,10 @@ class RepositoryAnalyzer:
         """
         print("\n=== RQ06: Razão de Issues Fechadas ===")
         
-        # Filtrar repositórios com pelo menos 1 issue
         df_with_issues = self.df[self.df['totalIssues'] > 0].copy()
         
         fig, axes = plt.subplots(1, 2, figsize=(15, 6))
         
-        # Histograma
         axes[0].hist(df_with_issues['closed_issues_ratio'], bins=30, 
                      edgecolor='black', alpha=0.7, range=(0, 100))
         axes[0].set_xlabel('Percentual de Issues Fechadas (%)')
@@ -267,7 +252,6 @@ class RepositoryAnalyzer:
                         linestyle='--', label=f'Média: {df_with_issues["closed_issues_ratio"].mean():.1f}%')
         axes[0].legend()
         
-        # Boxplot
         axes[1].boxplot(df_with_issues['closed_issues_ratio'])
         axes[1].set_ylabel('Percentual de Issues Fechadas (%)')
         axes[1].set_title('RQ06: Boxplot da Razão de Issues Fechadas')
@@ -288,13 +272,11 @@ class RepositoryAnalyzer:
         """
         print("\n=== RQ07 (BÔNUS): Métricas por Linguagem ===")
         
-        # Pegar as top 10 linguagens
         top_languages = self.df['primaryLanguage'].value_counts().head(10).index
         df_top_langs = self.df[self.df['primaryLanguage'].isin(top_languages)]
         
         fig, axes = plt.subplots(3, 1, figsize=(14, 16))
         
-        # RQ02 por linguagem - Pull Requests
         prs_by_lang = df_top_langs.groupby('primaryLanguage')['pullRequests'].agg(['mean', 'median'])
         prs_by_lang = prs_by_lang.sort_values('mean', ascending=False)
         
@@ -310,7 +292,6 @@ class RepositoryAnalyzer:
         axes[0].legend()
         axes[0].grid(True, alpha=0.3, axis='y')
         
-        # RQ03 por linguagem - Releases
         releases_by_lang = df_top_langs.groupby('primaryLanguage')['releases'].agg(['mean', 'median'])
         releases_by_lang = releases_by_lang.sort_values('mean', ascending=False)
         
@@ -325,7 +306,6 @@ class RepositoryAnalyzer:
         axes[1].legend()
         axes[1].grid(True, alpha=0.3, axis='y')
         
-        # RQ04 por linguagem - Dias desde última atualização
         days_by_lang = df_top_langs.groupby('primaryLanguage')['days_since_update'].agg(['mean', 'median'])
         days_by_lang = days_by_lang.sort_values('mean')
         
@@ -423,7 +403,6 @@ ARQUIVOS GERADOS:
 """
         print(report)
         
-        # Salvar relatório em arquivo
         with open(self.output_dir / 'relatorio_analise.txt', 'w', encoding='utf-8') as f:
             f.write(report)
         
@@ -437,7 +416,6 @@ ARQUIVOS GERADOS:
         
         self.load_data()
         
-        # Executar todas as RQs
         self.rq01_repository_age()
         self.rq02_pull_requests()
         self.rq03_releases()
@@ -446,7 +424,6 @@ ARQUIVOS GERADOS:
         self.rq06_closed_issues_ratio()
         self.rq07_metrics_by_language()
         
-        # Gerar relatório final
         self.generate_summary_report()
         
         print("\n" + "="*60)
@@ -456,6 +433,5 @@ ARQUIVOS GERADOS:
 
 
 if __name__ == '__main__':
-    # Executar análise
     analyzer = RepositoryAnalyzer()
     analyzer.run_all_analyses()
