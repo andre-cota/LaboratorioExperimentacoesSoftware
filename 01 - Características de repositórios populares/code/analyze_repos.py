@@ -99,22 +99,16 @@ class RepositoryAnalyzer:
         Métrica: total de pull requests aceitas
         """
         print("\n=== RQ02: Pull Requests Aceitas ===")
-        
-        fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-        
-        prs = self.df['pullRequests'][self.df['pullRequests'] > 0]
-        axes[0].hist(np.log10(prs + 1), bins=30, edgecolor='black', alpha=0.7)
-        axes[0].set_xlabel('log10(Pull Requests + 1)')
-        axes[0].set_ylabel('Número de Repositórios')
-        axes[0].set_title('RQ02: Distribuição de Pull Requests Aceitas')
-        
+
+        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
+
         top_prs = self.df.nlargest(20, 'pullRequests')[['name', 'pullRequests']]
-        axes[1].barh(range(len(top_prs)), top_prs['pullRequests'])
-        axes[1].set_yticks(range(len(top_prs)))
-        axes[1].set_yticklabels(top_prs['name'], fontsize=8)
-        axes[1].set_xlabel('Pull Requests Aceitas')
-        axes[1].set_title('RQ02: Top 20 Repositórios - PRs Aceitas')
-        axes[1].invert_yaxis()
+        ax.barh(range(len(top_prs)), top_prs['pullRequests'])
+        ax.set_yticks(range(len(top_prs)))
+        ax.set_yticklabels(top_prs['name'], fontsize=8)
+        ax.set_xlabel('Pull Requests Aceitas')
+        ax.set_title('RQ02: Top 20 Repositórios - PRs Aceitas')
+        ax.invert_yaxis()
         
         plt.tight_layout()
         plt.savefig(self.output_dir / 'RQ02_pull_requests.png', dpi=300, bbox_inches='tight')
@@ -129,24 +123,16 @@ class RepositoryAnalyzer:
         Métrica: total de releases
         """
         print("\n=== RQ03: Releases ===")
-        
-        fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-        
-        axes[0].hist(self.df['releases'], bins=50, edgecolor='black', alpha=0.7)
-        axes[0].set_xlabel('Número de Releases')
-        axes[0].set_ylabel('Número de Repositórios')
-        axes[0].set_title('RQ03: Distribuição de Releases')
-        axes[0].axvline(self.df['releases'].median(), color='red', 
-                        linestyle='--', label=f'Mediana: {self.df["releases"].median():.0f}')
-        axes[0].legend()
-        
-        top_releases = self.df.nlargest(20, 'releases')[['name', 'releases']]
-        axes[1].barh(range(len(top_releases)), top_releases['releases'])
-        axes[1].set_yticks(range(len(top_releases)))
-        axes[1].set_yticklabels(top_releases['name'], fontsize=8)
-        axes[1].set_xlabel('Número de Releases')
-        axes[1].set_title('RQ03: Top 20 Repositórios - Releases')
-        axes[1].invert_yaxis()
+
+        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
+
+        ax.hist(self.df['releases'], bins=50, edgecolor='black', alpha=0.7)
+        ax.set_xlabel('Número de Releases')
+        ax.set_ylabel('Número de Repositórios')
+        ax.set_title('RQ03: Distribuição de Releases')
+        ax.axvline(self.df['releases'].median(), color='red', 
+                   linestyle='--', label=f'Mediana: {self.df["releases"].median():.0f}')
+        ax.legend()
         
         plt.tight_layout()
         plt.savefig(self.output_dir / 'RQ03_releases.png', dpi=300, bbox_inches='tight')
