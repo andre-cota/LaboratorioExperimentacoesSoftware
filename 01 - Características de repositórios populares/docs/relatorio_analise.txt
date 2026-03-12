@@ -1,6 +1,6 @@
 
 ANÁLISE DE 1000 REPOSITÓRIOS POPULARES DO GITHUB
-Data da análise: 11/03/2026 21:42
+Data da análise: 11/03/2026 23:23
 
 RESUMO GERAL:
 -------------
@@ -30,7 +30,7 @@ RQ03 - RELEASES:
   → Sem releases: 148 (14.8%)
 
 RQ04 - FREQUÊNCIA DE ATUALIZAÇÃO:
-  → Média de dias desde última atualização: 105.1
+  → Média de dias desde última atualização: 105.3
   → Mediana: 1.0
   → Atualizados na última semana: 667 (66.7%)
   → Conclusão: Repositórios muito ativos

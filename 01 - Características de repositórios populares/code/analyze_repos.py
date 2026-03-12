@@ -96,19 +96,27 @@ class RepositoryAnalyzer:
         
     def rq02_pull_requests(self):
         """RQ02: Sistemas populares recebem muita contribuição externa?
-        Métrica: total de pull requests aceitas
+        Métrica: total de pull requests aceitas e stars
         """
-        print("\n=== RQ02: Pull Requests Aceitas ===")
+        print("\n=== RQ02: Pull Requests Aceitas e Stars ===")
 
-        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
+        fig, axes = plt.subplots(1, 2, figsize=(18, 6))
 
         top_prs = self.df.nlargest(20, 'pullRequests')[['name', 'pullRequests']]
-        ax.barh(range(len(top_prs)), top_prs['pullRequests'])
-        ax.set_yticks(range(len(top_prs)))
-        ax.set_yticklabels(top_prs['name'], fontsize=8)
-        ax.set_xlabel('Pull Requests Aceitas')
-        ax.set_title('RQ02: Top 20 Repositórios - PRs Aceitas')
-        ax.invert_yaxis()
+        axes[0].barh(range(len(top_prs)), top_prs['pullRequests'])
+        axes[0].set_yticks(range(len(top_prs)))
+        axes[0].set_yticklabels(top_prs['name'], fontsize=8)
+        axes[0].set_xlabel('Pull Requests Aceitas')
+        axes[0].set_title('RQ02: Top 20 Repositórios - PRs Aceitas')
+        axes[0].invert_yaxis()
+
+        top_stars = self.df.nlargest(20, 'stargazerCount')[['name', 'stargazerCount']]
+        axes[1].barh(range(len(top_stars)), top_stars['stargazerCount'])
+        axes[1].set_yticks(range(len(top_stars)))
+        axes[1].set_yticklabels(top_stars['name'], fontsize=8)
+        axes[1].set_xlabel('Número de Stars')
+        axes[1].set_title('RQ02: Top 20 Repositórios - Stars')
+        axes[1].invert_yaxis()
         
         plt.tight_layout()
         plt.savefig(self.output_dir / 'RQ02_pull_requests.png', dpi=300, bbox_inches='tight')
@@ -117,6 +125,9 @@ class RepositoryAnalyzer:
         print(f"Média de PRs: {self.df['pullRequests'].mean():.2f}")
         print(f"Mediana de PRs: {self.df['pullRequests'].median():.2f}")
         print(f"Total de PRs: {self.df['pullRequests'].sum()}")
+        print(f"\nMédia de Stars: {self.df['stargazerCount'].mean():.2f}")
+        print(f"Mediana de Stars: {self.df['stargazerCount'].median():.2f}")
+        print(f"Total de Stars: {self.df['stargazerCount'].sum()}")
         
     def rq03_releases(self):
         """RQ03: Sistemas populares lançam releases com frequência?
