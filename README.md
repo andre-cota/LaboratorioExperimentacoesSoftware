@@ -9,7 +9,7 @@ Repositorio destinado a disciplina de Laboratório de Experimentações de Softw
 
 Será dividido em 5 trabalhos (enunciados) durante o semestre:
  1. _Características de repositórios populares_
- 2. 
+ 2. _Um estudo das características de qualidade de sistemas java_
  3. 
  4. 
  5. 
