@@ -14,6 +14,10 @@ from pathlib import Path
 from repository_analyzer import RepositoryAnalyzer
 
 
+# -------------------------------------------------
+# Logging
+# -------------------------------------------------
+
 def setup_logging(level="INFO"):
     logging.basicConfig(
         level=getattr(logging, level.upper(), logging.INFO),
@@ -21,6 +25,10 @@ def setup_logging(level="INFO"):
         datefmt="%H:%M:%S",
     )
 
+
+# -------------------------------------------------
+# CLI
+# -------------------------------------------------
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -30,7 +38,7 @@ def parse_args():
     parser.add_argument(
         "--input",
         default="output/dataset_cache.csv",
-        help="Caminho do CSV (ex: output/dataset_cache.csv)"
+        help="Caminho do CSV"
     )
 
     parser.add_argument(
@@ -47,6 +55,32 @@ def parse_args():
 
     return parser.parse_args()
 
+
+# -------------------------------------------------
+# Validação do dataset
+# -------------------------------------------------
+
+def validate_columns(df: pd.DataFrame):
+    required = [
+        "state",
+        "additions",
+        "deletions",
+        "analysis_time_h",
+        "body_len",
+        "participants",
+        "comments",
+        "reviews",
+    ]
+
+    missing = [c for c in required if c not in df.columns]
+
+    if missing:
+        raise SystemExit(f"[ERRO] Colunas obrigatórias ausentes: {missing}")
+
+
+# -------------------------------------------------
+# MAIN
+# -------------------------------------------------
 
 def main():
     args = parse_args()
@@ -67,9 +101,24 @@ def main():
     if df.empty:
         raise SystemExit("[ERRO] Dataset vazio.")
 
-    logging.info("Total de registros: %d", len(df))
+    logging.info("Total de PRs: %d", len(df))
 
-    analyzer = RepositoryAnalyzer(df=df, output_dir=str(output_path))
+    # 🔥 valida estrutura
+    validate_columns(df)
+
+    # 🔥 limpeza básica (evita bugs silenciosos)
+    df = df.dropna(subset=["state"])
+
+    # 🔥 normalização simples
+    df["state"] = df["state"].str.upper()
+
+    logging.info("Iniciando análise...")
+
+    analyzer = RepositoryAnalyzer(
+        df=df,
+        output_dir=str(output_path)
+    )
+
     analyzer.run()
 
     logging.info("=" * 50)
@@ -77,6 +126,10 @@ def main():
     logging.info("Arquivos gerados em: %s", output_path.resolve())
     logging.info("=" * 50)
 
+
+# -------------------------------------------------
+# Entry point
+# -------------------------------------------------
 
 if __name__ == "__main__":
     main()

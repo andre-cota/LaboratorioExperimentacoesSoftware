@@ -1,12 +1,17 @@
 """
-RepositoryAnalyzer
-Análise de métricas de repositórios (processo vs qualidade)
+RepositoryAnalyzer (LAB03 - Code Review)
+
+Analisa métricas de PRs:
+- Tamanho
+- Tempo de análise
+- Descrição
+- Interações
+- Reviews
 """
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime
 from pathlib import Path
 
 sns.set(style="darkgrid")
@@ -15,24 +20,18 @@ plt.rcParams["figure.figsize"] = (10, 6)
 
 class RepositoryAnalyzer:
 
-    def __init__(self, df: pd.DataFrame = None, csv_file: str = None, output_dir: str = "docs"):
-        """
-        Pode receber:
-        - df diretamente (recomendado)
-        - OU csv_file
-        """
+    def __init__(self, df=None, csv_file=None, output_dir="docs"):
+
         if df is None and csv_file is None:
             raise ValueError("Informe df OU csv_file")
 
         self.df = df
         self.csv_file = Path(csv_file) if csv_file else None
-        self.now = datetime.now()
-
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 
     # -------------------------------------------------
-    # Load
+    # LOAD + FEATURE ENGINEERING
     # -------------------------------------------------
 
     def load_data(self):
@@ -40,162 +39,89 @@ class RepositoryAnalyzer:
             print(f"Carregando CSV: {self.csv_file}")
             self.df = pd.read_csv(self.csv_file)
 
-        # Normalização
-        if "createdAt" in self.df.columns:
-            self.df["createdAt"] = pd.to_datetime(
-                self.df["createdAt"], errors="coerce", utc=True
-            ).dt.tz_localize(None)
+        print(f"{len(self.df)} PRs carregados")
 
-            self.df["age_years"] = (
-                self.now - self.df["createdAt"]
-            ).dt.days / 365.25
-
-        print(f"{len(self.df)} registros carregados")
+        # 🔥 Features derivadas
+        self.df["size"] = self.df["additions"] + self.df["deletions"]
+        self.df["interactions"] = self.df["participants"] + self.df["comments"]
+        self.df["merged"] = self.df["state"].apply(
+            lambda x: 1 if x == "MERGED" else 0
+        )
 
     # -------------------------------------------------
-    # Util
+    # RQ01 — Tamanho vs Aceitação
     # -------------------------------------------------
 
-    def _check_columns(self, cols):
-        missing = [c for c in cols if c not in self.df.columns]
-        if missing:
-            raise ValueError(f"Colunas ausentes: {missing}")
+    def rq01_size_vs_acceptance(self):
+        print("\nRQ01 — Tamanho vs Aceitação")
 
-    # -------------------------------------------------
-    # RQ01
-    # -------------------------------------------------
-
-    def rq01_popularity_quality(self):
-        print("\nRQ01 – Popularidade x Qualidade")
-
-        cols = ["stargazerCount", "CBO", "DIT", "LCOM"]
-        self._check_columns(cols)
-
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-        sns.scatterplot(data=self.df, x="stargazerCount", y="CBO", ax=axes[0])
-        axes[0].set_title("Stars vs CBO")
-
-        sns.scatterplot(data=self.df, x="stargazerCount", y="DIT", ax=axes[1])
-        axes[1].set_title("Stars vs DIT")
-
-        sns.scatterplot(data=self.df, x="stargazerCount", y="LCOM", ax=axes[2])
-        axes[2].set_title("Stars vs LCOM")
-
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "RQ01_popularity_quality.png")
+        sns.boxplot(data=self.df, x="state", y="size")
+        plt.title("Tamanho do PR vs Status")
+        plt.savefig(self.output_dir / "rq01_size_vs_acceptance.png")
         plt.close()
 
-        print(self.df[cols].corr())
+        print(self.df.groupby("state")["size"].median())
 
     # -------------------------------------------------
-    # RQ02
+    # RQ02 — Tempo vs Aceitação
     # -------------------------------------------------
 
-    def rq02_maturity_quality(self):
-        print("\nRQ02 – Maturidade x Qualidade")
+    def rq02_time_vs_acceptance(self):
+        print("\nRQ02 — Tempo de análise vs Aceitação")
 
-        cols = ["age_years", "CBO", "DIT", "LCOM"]
-        self._check_columns(cols)
-
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-        sns.scatterplot(data=self.df, x="age_years", y="CBO", ax=axes[0])
-        axes[0].set_title("Idade vs CBO")
-
-        sns.scatterplot(data=self.df, x="age_years", y="DIT", ax=axes[1])
-        axes[1].set_title("Idade vs DIT")
-
-        sns.scatterplot(data=self.df, x="age_years", y="LCOM", ax=axes[2])
-        axes[2].set_title("Idade vs LCOM")
-
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "RQ02_maturity_quality.png")
+        sns.boxplot(data=self.df, x="state", y="analysis_time_h")
+        plt.title("Tempo de análise vs Status")
+        plt.savefig(self.output_dir / "rq02_time_vs_acceptance.png")
         plt.close()
 
-        print(self.df[cols].corr())
+        print(self.df.groupby("state")["analysis_time_h"].median())
 
     # -------------------------------------------------
-    # RQ03
+    # RQ03 — Descrição vs Aceitação
     # -------------------------------------------------
 
-    def rq03_activity_quality(self):
-        print("\nRQ03 – Atividade x Qualidade")
+    def rq03_description_vs_acceptance(self):
+        print("\nRQ03 — Descrição vs Aceitação")
 
-        cols = ["releases", "CBO", "DIT", "LCOM"]
-        self._check_columns(cols)
-
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-        sns.scatterplot(data=self.df, x="releases", y="CBO", ax=axes[0])
-        axes[0].set_title("Releases vs CBO")
-
-        sns.scatterplot(data=self.df, x="releases", y="DIT", ax=axes[1])
-        axes[1].set_title("Releases vs DIT")
-
-        sns.scatterplot(data=self.df, x="releases", y="LCOM", ax=axes[2])
-        axes[2].set_title("Releases vs LCOM")
-
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "RQ03_activity_quality.png")
+        sns.boxplot(data=self.df, x="state", y="body_len")
+        plt.title("Tamanho da descrição vs Status")
+        plt.savefig(self.output_dir / "rq03_description_vs_acceptance.png")
         plt.close()
 
-        print(self.df[cols].corr())
+        print(self.df.groupby("state")["body_len"].median())
 
     # -------------------------------------------------
-    # RQ04
+    # RQ04 — Interações vs Aceitação
     # -------------------------------------------------
 
-    def rq04_size_quality(self):
-        print("\nRQ04 – Tamanho x Qualidade")
+    def rq04_interactions_vs_acceptance(self):
+        print("\nRQ04 — Interações vs Aceitação")
 
-        cols = ["LOC", "CBO", "DIT", "LCOM"]
-        self._check_columns(cols)
-
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-        sns.scatterplot(data=self.df, x="LOC", y="CBO", ax=axes[0])
-        axes[0].set_title("LOC vs CBO")
-
-        sns.scatterplot(data=self.df, x="LOC", y="DIT", ax=axes[1])
-        axes[1].set_title("LOC vs DIT")
-
-        sns.scatterplot(data=self.df, x="LOC", y="LCOM", ax=axes[2])
-        axes[2].set_title("LOC vs LCOM")
-
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "RQ04_size_quality.png")
+        sns.boxplot(data=self.df, x="state", y="interactions")
+        plt.title("Interações vs Status")
+        plt.savefig(self.output_dir / "rq04_interactions_vs_acceptance.png")
         plt.close()
 
-        print(self.df[cols].corr())
+        print(self.df.groupby("state")["interactions"].median())
 
     # -------------------------------------------------
-    # Matriz
+    # RQ05–RQ08 — Correlação com Reviews
     # -------------------------------------------------
 
-    def correlation_matrix(self):
-        print("\nGerando matriz de correlação")
+    def correlation_with_reviews(self):
+        print("\nCorrelação com número de reviews")
 
-        cols = [
-            "stargazerCount",
-            "age_years",
-            "releases",
-            "LOC",
-            "CBO",
-            "DIT",
-            "LCOM",
-        ]
+        cols = ["size", "analysis_time_h",
+                "body_len", "interactions", "reviews"]
 
-        self._check_columns(cols)
+        corr = self.df[cols].corr(method="spearman")
 
-        corr = self.df[cols].corr()
+        print(corr)
 
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=(8, 6))
         sns.heatmap(corr, annot=True, cmap="coolwarm")
-
-        plt.title("Correlação geral")
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "correlation_matrix.png")
+        plt.title("Correlação (Spearman)")
+        plt.savefig(self.output_dir / "correlation_reviews.png")
         plt.close()
 
     # -------------------------------------------------
@@ -207,12 +133,11 @@ class RepositoryAnalyzer:
 
         self.load_data()
 
-        self.rq01_popularity_quality()
-        self.rq02_maturity_quality()
-        self.rq03_activity_quality()
-        self.rq04_size_quality()
-
-        self.correlation_matrix()
+        self.rq01_size_vs_acceptance()
+        self.rq02_time_vs_acceptance()
+        self.rq03_description_vs_acceptance()
+        self.rq04_interactions_vs_acceptance()
+        self.correlation_with_reviews()
 
         print("\nAnálise finalizada!")
         print(f"Saída em: {self.output_dir}")
